@@ -1,0 +1,6 @@
+streamlit
+streamlit-option-menu 
+pymongo
+dnspython
+python-dotenv
+google-generativeai
