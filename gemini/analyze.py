@@ -2,12 +2,18 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 import streamlit as st
+import typing_extensions as typing
+import json
 
-def configure():
-    load_dotenv()
-#os.environ["GEMINI_API_KEY"] = "API_KEY"
 
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"]) # also use os.getenv("GEMINI_API_KEY")
+load_dotenv()
+
+genai.configure(api_key=#os.getenv("GEMINI_API_KEY")
+                st.secrets["GEMINI_API_KEY"] # also use os.getenv("GEMINI_API_KEY")
+)
+class Timetable(typing.TypedDict):
+    day : int
+    task : str
 
 # Create the model
 generation_config = {
@@ -22,6 +28,52 @@ model = genai.GenerativeModel(
   model_name="gemini-1.5-pro",
   generation_config=generation_config,
 )
+
+def timetable(task):
+    # Create the model
+    generation_config = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 8192,
+    "response_mime_type": "application/json",
+    "response_schema" : list[Timetable]
+    }
+
+    model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro",
+    generation_config=generation_config,
+    )
+
+    chat_session = model.start_chat(
+        history = [
+            {
+                'role' : 'user',
+                'parts' : [
+                    {
+                        'text' :"""
+                            Prepare a timetable for the task provided to complete it in the days required to complete it fully from basics 
+                            to depth.
+
+                            the output should be in the the given format:
+                            day : day number , e.g. , day = 1 or day = 2
+                            task : the task to be accompilshed in that day respectively.
+
+                            there is no boundation of time to complete the task. the main goal is to complete task in a very effective way.
+                        """
+                    }
+                ]
+            }
+        ]
+    )
+
+    try : 
+        response = chat_session.send_message(task)
+        response = json.loads(response.text)
+        return response
+    except Exception as e : 
+        return {"error " : e}
+
 
 def recommend(task , query):
 
@@ -109,7 +161,7 @@ def recommend_module(task):
         return "Error: Unable to generate recommendation."
 
 
-configure()
+
 '''
 task1 = "i want to create a platform where anyone with mere idea and may or may have not have any  technical knowledge can hire a mentor(if they require) who would guide them about how this idea could be made reality.If the user wants to create a team of like minded peeps who have required technical knowledge to make this idea a real working project. After creation of the fully functional prototype the team may post the description of  idea, prototype its all use case and its importance, the field where it may be useful its version control repository(soo that if anyone of the peer user of the platform may find any bugs or have any betterment in there mind could easily clone the repo and do the required changes and could contribute for bounties).Once the overall description with the video, images, other use cases are posted on the platform all other users can upvote the post if they find the prototype and idea useful.The post with major upvotes will be highlighted and grab the attention of investors and fund providers.The  investors may message them personally, they could arrange an online meeting on the platform for further discussions and if everything goes right the developer of the platform could get funding. And hence the platform could be used as a game changer in startup india. The user may also be able to find the collaborative working space near them (if they require) such as incubation centers etc. the user could also get a all the professionals and government agents for  statups registration,idea patent, copy right documentation creation.the plstform would also incliude a workspace where anyone who wants can publish there dataset on the space soo that anyone else who require a same dataset could easily get it"
 task2 ="make it concise and in well structured points soo that i could mention it in my project ppt and make sure it describes the project completely"

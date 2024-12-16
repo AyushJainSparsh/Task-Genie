@@ -2,12 +2,13 @@ import hashlib
 from pymongo import MongoClient
 import streamlit as st
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # MongoDB Connection
 #mongo_uri = os.getenv("MONGO_URI")
 #client = MongoClient(mongo_uri)
-client = MongoClient(st.secrets["MONGO_URI"] , tls=True,
-        tlsAllowInvalidCertificates=False,)
+client = MongoClient(st.secrets["MONGO_URI"] , tls=True,tlsAllowInvalidCertificates=False,)
 db = client["todopro"]
 users_collection = db["users"]
 
@@ -25,7 +26,7 @@ def signup():
             st.warning("Username already exists. Please choose a different username.")
         else:
             hashed_password = hash_password(password)
-            users_collection.insert_one({"username": username, "password": hashed_password})
+            users_collection.insert_one({"username": username, "password": hashed_password , "email_token_json" : "none"})
             st.success("Signup successful! You can now sign in.")
             st.session_state.page = "signin"
 

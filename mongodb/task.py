@@ -2,12 +2,21 @@ from pymongo import MongoClient
 import streamlit as st
 import os
 import gemini.analyze as anal
+from dotenv import load_dotenv
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from google.auth.transport.requests import Request # to send request to refresh token
+import os
+from datetime import datetime , timedelta , date
+import json
+
+load_dotenv()
 
 # MongoDB Connection
 #mongo_uri = os.getenv("MONGO_URI")
 #client = MongoClient(mongo_uri)
-client = MongoClient(st.secrets["MONGO_URI"] , tls=True,
-        tlsAllowInvalidCertificates=False,)
+client = MongoClient(st.secrets["MONGO_URI"] , tls=True, tlsAllowInvalidCertificates=False,)
 db = client["todopro"]
 users_collection = db["users"]
 tasks_collection = db["tasks"]
@@ -46,6 +55,78 @@ def task_manager():
         for t in pending_tasks:
             st.write(f"- {t['task']} (Priority: {t['priority']}) (Status: {t['status']})")
     st.write("--------------------------------------------------------------------------------------------------------------------------")
+
+    # add calender 
+
+    task_table = st.selectbox("Select Task" , [task["task"] for task in pending_tasks])
+
+    if st.button("Add TimeTable"):
+
+        client_json = st.secrets["CLIENT_SECRET"]
+
+        with open('client_secret.json' , 'w') as file:
+            json.dump(json.loads(client_json) , file)
+
+        creds = None
+        SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+        user = users_collection.find_one({"_id": user_id})
+
+        token = user.get("email_token_json")
+
+        if user and user.get("email_token_json"):
+            with open('token.json' , 'w') as file:
+                json.dump(json.loads(token) , file)
+
+            # Check if the token.json file exists to get stored credentials
+            if token != "none" and os.path.exists('token.json'):
+                creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+        # If there are no (valid) credentials, prompt the user to log in
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                # Refresh the token if expired
+                creds.refresh(Request())
+            else:
+                # Run the OAuth flow to get new credentials
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    #'mongodb/client_secret.json',
+                    "client_secret.json" ,
+                     SCOPES)
+                creds = flow.run_local_server(port=8080)
+
+            # Save the credentials to token.json for future use
+            users_collection.update_one({"_id" : user_id} , {"$set" : {"email_token_json" : creds.to_json()}})
+
+        # Create the Google Calendar service
+        service = build('calendar', 'v3', credentials=creds)
+
+        timetable = anal.timetable(task_table)
+
+        start_date = date.today()
+
+        for item in timetable:
+            # Calculate the event date
+            event_date = start_date + timedelta(days=item['day'] - 1)  # Day 1 is the starting date
+            
+            # Create the event
+            event = {
+                'summary': item['task'],
+                'start': {
+                    'dateTime': event_date.isoformat() + 'T17:00:00',  # Starting at 9 AM (you can change the time)
+                    'timeZone': 'Asia/Kolkata',  # Set time zone for India
+                },
+                'end': {
+                    'dateTime': event_date.isoformat() + 'T18:00:00',  # Ending at 10 AM (you can adjust the duration)
+                    'timeZone': 'Asia/Kolkata',
+                },
+            }
+
+            # Insert the event into the calendar
+            created_event = service.events().insert(calendarId='primary', body=event).execute()
+            st.write(f"Event created: {created_event['summary']} on {created_event['start']['dateTime']}")
+
+    st.write("----------------------------------------------------------------------------------------------------------------------")
 
 
     # Mark Task as Done

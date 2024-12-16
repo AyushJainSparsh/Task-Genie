@@ -2,12 +2,13 @@ import hashlib
 from pymongo import MongoClient
 import streamlit as st
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # MongoDB Connection
 #mongo_uri = os.getenv("MONGO_URI")
 #client = MongoClient(mongo_uri)
-client = MongoClient(st.secrets["MONGO_URI"], tls=True,
-        tlsAllowInvalidCertificates=False,)
+client = MongoClient(st.secrets["MONGO_URI"], tls=True,tlsAllowInvalidCertificates=False,)
 db = client["todopro"]
 users_collection = db["users"]
 
