@@ -56,7 +56,7 @@ def task_manager():
             st.write(f"- {t['task']} (Priority: {t['priority']}) (Status: {t['status']})")
     st.write("--------------------------------------------------------------------------------------------------------------------------")
 
-    # add calender 
+    # add TimeTable 
 
     task_table = st.selectbox("Select Task" , [task["task"] for task in pending_tasks])
 
