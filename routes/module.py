@@ -57,7 +57,8 @@ def recommend_module():
             
             res = ""
             for o in response:
-                res = res + f'{o['header']}' + ' <br> '+ f'Module : {o['module']}'+' <br> '+ o['module_inside_info'] + '<br> <br> '
+                res = res + f'{o["header"]}' + ' <br> ' + f'Module : {o["module"]}' + ' <br> ' + o["module_inside_info"] + '<br> <br> '
+
 
             return jsonify({"module" : res})
         except Exception as e:
