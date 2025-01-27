@@ -60,7 +60,8 @@ def recommend_roadmap():
             response = json.loads(response.text)
             res = ""
             for o in response:
-                res = res + f'{o['format']} : {o['phase']}'+' <br> '+ o['task']+' <br> <br> '
+                res = res + f'{o["format"]} : {o["phase"]}' + ' <br> ' + o["task"] + ' <br> <br> '
+
 
             return jsonify({"format" : response[0]["format"] , 
                 "roadmap" : res})
