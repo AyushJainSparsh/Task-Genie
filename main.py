@@ -21,4 +21,4 @@ def home():
     return "Welcome to my AI-World"  # This is the home page route
 
 if __name__ == "__main__":
-    app.run(debug=True)  # Start the Flask app
+    app.run(host="0.0.0.0", port=5000,debug=True)  # Start the Flask app
