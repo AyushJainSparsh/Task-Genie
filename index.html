@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+</head>
+<body>
+    <h1>Task Query</h1>
+    <div id="task-form">
+        <label for="task">Task:</label>
+        <input type="text" id="task" name="task" required>
+        <button type="button" id="priority-btn">Generate Priority</button>
+        <button type="button" id="roadmap-btn">Generate Roadmap</button>
+        <button type="button" id="module-btn">Generate Module</button>
+        <button type="button" id="timetable-btn">Save Timetable</button>
+    </div>
+    <div id="priority"></div>
+    <div id="roadmap">
+        <p id="Roadmap">Roadmap</p>
+    </div>
+    <div id="timetable">
+        <p id="Timetable">Timetable Logs</p>
+    </div>
+    <div id="module">
+        <p id="Module">Module</p>
+    </div>
+    <div id="query-form">
+        <label for="query">Query:</label>
+        <input type="text" id="query" name="query" required>
+        <button type="button" id="ask-query-btn">Ask Query</button>
+    </div>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById("timetable-btn").addEventListener("click", async (event)=> {
+            event.preventDefault();
+            const task = document.getElementById("task").value;
+
+            try{
+                // access token from database and provide here
+                const saveTimeTable = await fetch("http://127.0.0.1:5000/settimetable",{
+                    method : "POST",
+                    headers : {"Content-Type" : "application/json"},
+                    body : JSON.stringify({task,token})
+                });
+
+                const result = await saveTimeTable.json();
+                document.getElementById("Timetable").innerHTML = result.response || result.error;
+                // get update token as result.token and save to database for further access
+            }catch(error){
+                console.error("Error :" , error);
+                document.getElementById("Timetable").innerHTML = "An error occured.";
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("priority-btn").addEventListener("click", async (event) => {
+            event.preventDefault();
+            const task = document.getElementById("task").value;
+
+            try{
+                const recommendpriority = await fetch("http://127.0.0.1:5000/recommendpriority"
+                    
+                     , {
+                    method : "POST",
+                    headers : {"Content-Type" : "application/json" },
+                    body:JSON.stringify({task})
+                });
+
+                const resultpriority = await recommendpriority.json();
+                document.getElementById("priority").textContent = resultpriority.priority || resultpriority.error;
+            }catch(error){
+                console.error("Error:" , error);
+                document.getElementById("priority").textContent = "An error occured.";
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("roadmap-btn").addEventListener("click", async (event) => {
+            event.preventDefault();
+            const task = document.getElementById("task").value;
+            try{
+                const recommendroadmap = await fetch(
+                "http://127.0.0.1:5000/recommendroadmap"
+                , {
+                    method : "POST",
+                    headers : {"Content-Type" : "application/json" },
+                    body:JSON.stringify({task})
+                });
+
+                const resultroadmap = await recommendroadmap.json()
+                document.getElementById("Roadmap").innerHTML = resultroadmap.roadmap || resultroadmap.error;
+            }catch(error){
+                console.error("Error:" , error);
+                document.getElementById("Roadmap").innerHTML = "An error occured.";
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("module-btn").addEventListener("click", async (event) => {
+            event.preventDefault();
+            const task = document.getElementById("task").value;
+            try{
+                const recommendmodule = await fetch(
+                "http://127.0.0.1:5000/recommendmodule"
+                , {
+                    method : "POST",
+                    headers : {"Content-Type" : "application/json" },
+                    body:JSON.stringify({task})
+                });
+
+                const resultmodule = await recommendmodule.json()
+                document.getElementById("Module").innerHTML = resultmodule.module || resultmodule.error;
+            }catch(error){
+                console.error("Error:" , error);
+                document.getElementById("Module").innerHTML = "An error occured.";
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById("ask-query-btn").addEventListener("click", async (event) => {
+            event.preventDefault();
+            const task = document.getElementById("task").value;
+            const query = document.getElementById("query").value;
+
+            try {
+                const response = await fetch(
+                "http://127.0.0.1:5000/recommend"
+                , {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ task, query })
+                });
+
+                const result = await response.json();
+                document.getElementById("response").innerHTML = result.recommendation || result.error;
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("response").innerHTML = "An error occurred.";
+            }
+        });
+    </script>
+
+</body>
+</html>
