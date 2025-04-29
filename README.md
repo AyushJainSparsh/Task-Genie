@@ -1,7 +1,7 @@
 
-# AI Powered TODO App
+# Task Genie
 
-Welcome to the TODO App — a streamlined and intelligent task management solution! This app is designed to help you manage your daily tasks and schedules efficiently while leveraging the power of AI to provide personalized guidance for your goals.
+Welcome to Task Genie — a streamlined and intelligent task management solution! This app is designed to help you manage your daily tasks and schedules efficiently while leveraging the power of AI to provide personalized guidance for your goals.
 
 ## 🚀 Features
 - **Streamlit Frontend**: A clean and interactive user interface built using the `streamlit` library in Python.
@@ -21,7 +21,7 @@ Welcome to the TODO App — a streamlined and intelligent task management soluti
 
 ## 🛠️ Technologies Used
 - **Frontend**: [Streamlit](https://streamlit.io/)
-- **AI Integration**: Gemini API
+- **AI Integration**: [Gemini API](https://aistudio.google.com/)
 - **Database**: [MongoDB](https://www.mongodb.com/)
 - **Calendar Integration**: [Google Calendar API](https://developers.google.com/calendar)
 
@@ -30,8 +30,8 @@ Follow these steps to set up the project on your local system:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/todo-app.git
-   cd todo-app
+   git clone https://github.com/ayushjainsparsh/task-genie.git
+   cd task-genie
    ```
 
 2. **Create a Virtual Environment**:
@@ -89,4 +89,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-💡 **Transform the way you manage your tasks with this AI-powered TODO app!**
+💡 **Transform the way you manage your tasks with this Task Genie!**
